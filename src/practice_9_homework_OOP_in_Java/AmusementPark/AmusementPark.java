@@ -1,7 +1,5 @@
 package practice_9_homework_OOP_in_Java.AmusementPark;
 
-import org.w3c.dom.Attr;
-
 public class AmusementPark {
 
     private Attraction attraction;
