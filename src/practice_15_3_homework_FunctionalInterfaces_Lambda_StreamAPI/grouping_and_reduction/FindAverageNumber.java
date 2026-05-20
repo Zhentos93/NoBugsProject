@@ -1,3 +1,5 @@
+/*Задача: Напишите программу, которая принимает список чисел и находит их среднее значение, используя Stream API.*/
+
 package practice_15_3_homework_FunctionalInterfaces_Lambda_StreamAPI.grouping_and_reduction;
 
 import java.util.Arrays;
