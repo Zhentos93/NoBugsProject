@@ -7,7 +7,15 @@ import java.lang.Runnable;
 
 public class MainForRunnable {
     public static void main(String[] args) {
-        Runnable r = () -> System.out.println("Hello from anonymous class!");
-        r.run();
+        Runnable r1 = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Hello from anonymous class!");
+            }
+        };
+        r1.run();
+
+//        Runnable r = () -> System.out.println("Hello from anonymous class!");
+//        r.run();
     }
 }

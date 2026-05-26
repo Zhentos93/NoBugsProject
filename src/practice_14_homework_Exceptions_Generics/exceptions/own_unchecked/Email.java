@@ -12,7 +12,8 @@ public class Email {
 
     public void checkEmail(String email) throws InvalidEmail {
 
-        Pattern pattern = Pattern.compile("test@mail.com");
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
         Matcher matcher = pattern.matcher(email);
 
         boolean isValid = matcher.matches();

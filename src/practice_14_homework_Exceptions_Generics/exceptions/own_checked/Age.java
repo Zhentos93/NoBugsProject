@@ -10,15 +10,13 @@ public class Age {
         if (age < 0 || age > 150) {
             throw new IncorrectAge("такой возраст не подходит");
         }
-        else {
-            System.out.println("Возраст валиден");
-        }
     }
 
     public static void main(String[] args) {
         Age age = new Age();
         try {
-            age.checkAge(0);
+            age.checkAge(151);
+            System.out.println("Подходящий возраст");
         } catch (IncorrectAge e) {
             System.err.println("Ошибка: " + e.getMessage());
         }
