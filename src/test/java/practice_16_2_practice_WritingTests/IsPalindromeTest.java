@@ -9,23 +9,26 @@ import static org.junit.jupiter.api.Assertions.*;
 public class IsPalindromeTest extends StringProcessorTest {
     /**
      * Тесты для проверки, является ли палиндромом:
-     * позитивные кейсы:
-     * - четное кол-во: "abba" -> true
-     * - нечетное кол-во: "hah" -> true
-     * негативные кейсы:
-     * - "john" -> false
+     * positive cases:
+     *      четное кол-во: "abba" -> true
+     *      нечетное кол-во: "hah" -> true
      * corner cases:
-     * - "a" -> true
-     * - "" -> true
-     * - null -> IllegalArgumentException
+     *      "a" -> true
+     *      "" -> true
+     * negative cases:
+     *      "john" -> false
+     *      null -> IllegalArgumentException
      */
 
     @ParameterizedTest
     @ValueSource(strings = {
-            // позитивные кейсы
-            "abba", "hah",
-            // угловые кейсы
-            "a", ""})
+            // positive cases
+            "abba",
+            "hah",
+
+            // corner cases
+            "a", ""
+    })
     public void userCanCheckIfValidStringIsPalindrome(String initialString) {
         boolean actualResult = stringProcessor.isPalindrome(initialString);
 
@@ -43,8 +46,10 @@ public class IsPalindromeTest extends StringProcessorTest {
 
     @Test
     public void userCannotCheckIfNullStringIsPalindrome() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            stringProcessor.reverse(null);
-        }, "Checking if Null string is palindrome should lead to IllegalArgumentException");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> stringProcessor.reverse(null),
+                "Checking if Null string is palindrome should lead to IllegalArgumentException"
+        );
     }
 }

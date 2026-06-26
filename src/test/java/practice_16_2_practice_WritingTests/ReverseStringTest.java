@@ -14,21 +14,24 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ReverseStringTest extends StringProcessorTest {
     /**
      * Тесты для переворота строки:
-     * happy path: "sasha" -> "ahsas"
+     * positive cases:
+     *     "sasha" -> "ahsas"
      * corner cases:
-     * "" -> ""
-     * "a" -> "a"
-     * null -> IllegalArgument Exception
+     *     "" -> ""
+     *     "a" -> "a"
+     * negative cases:
+     *     null -> IllegalArgument Exception
      */
 
     public static Stream<Arguments> validStringsToReverse() {
         return Stream.of(
-                // happy path: "sasha" -> "ahsas"
+                // positive cases
                 Arguments.of("sasha", "ahsas"),
-                // corner cases: "" -> ""
+
+                // corner cases:
                 Arguments.of("", ""),
-                // corner cases: "a" -> "a"
-                Arguments.of("a", "a"));
+                Arguments.of("a", "a")
+        );
     }
 
     @ParameterizedTest
@@ -42,8 +45,10 @@ public class ReverseStringTest extends StringProcessorTest {
 
     @Test
     public void userCannotReverseNullString() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            stringProcessor.reverse(null);
-        }, "Reversing of null string should lead to IllegalArgumentException");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> stringProcessor.reverse(null),
+                "Reversing of null string should lead to IllegalArgumentException"
+        );
     }
 }

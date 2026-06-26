@@ -25,10 +25,10 @@ public class StringProcessor {
     public String validateLength(String input, int minLength) {
         if (input == null) {
             throw new IllegalArgumentException("Input cannot be null");
-        };
+        }
         if (input.length() < minLength) {
             throw new IllegalArgumentException("Input cannot be at least " + minLength);
         }
         return input;
-    };
+    }
 }
