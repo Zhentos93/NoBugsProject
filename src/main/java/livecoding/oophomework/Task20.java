@@ -57,6 +57,6 @@ public class Task20 {
         cinemaSession.cancelReservation(2);
         System.out.println("Свободных мест: " + cinemaSession.getFreeSeatsCount());
 
-        System.out.println("Место свободно: " + cinemaSession.isSeatReserved(1));
+        System.out.println("Место забронировано: " + cinemaSession.isSeatReserved(1));
     }
 }
