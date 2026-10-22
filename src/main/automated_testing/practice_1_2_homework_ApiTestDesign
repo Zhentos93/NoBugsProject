@@ -1,0 +1,305 @@
+Predictions
+
+### Admin can create new user with correct data
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+    "username": "sasha",
+    "password": "Strong1!",
+    "role": "USER"
+}
+
+{
+    "id": 1,
+    "username": "sasha",
+    "password": "$2a$10$h7qooIPAwi3eSk.RQfUDje2VfHo2xaN9ZISN51Nf5KG6/zd4L.QXC",
+    "name": null,
+    "role": "USER",
+    "accounts": []
+}
+
+{
+    "username": "katya",
+    "password": "Strong2!",
+    "role": "USER"
+}
+
+{
+    "id": 2,
+    "username": "katya",
+    "password": "$2a$10$hOE/JqeTfKmxsUkkjQDHreRNwsE40gzEYogNRDu/KMqXKKfOZPi0S",
+    "name": null,
+    "role": "USER",
+    "accounts": []
+}
+
+### Authorized user can create account
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 1,
+    "accountNumber": "ACC1",
+    "balance": 0.0,
+    "transactions": []
+}
+
+{
+    "id": 2,
+    "accountNumber": "ACC2",
+    "balance": 0.0,
+    "transactions": []
+}
+
+{
+    "id": 3,
+    "accountNumber": "ACC3",
+    "balance": 0.0,
+    "transactions": []
+}
+
+
+USER DEPOSIT
+
+
+1.
+### Positive test: Authorized user can deposit minimum amount
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization for sasha: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 1,
+    "balance": 0.01
+}
+
+{
+    "id": 1,
+    "balance": 0.011
+}
+
+
+2.
+### Positive test: Authorized user can deposit maximum amount
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 1,
+    "balance": 4999.99
+}
+
+{
+    "id": 1,
+    "balance": 5000
+}
+
+
+3.
+### Negative test: Authorized user cannot deposit zero amount
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 1,
+    "balance": 0
+}
+
+
+4.
+### Negative test: Authorized user cannot deposit an amount outside the allowed range
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 1,
+    "balance": 0.0099
+}
+
+{
+    "id": 1,
+    "balance": 5000.01
+}
+
+
+5.
+### Negative test: Authorized user cannot fund a non-existent deposit
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 3,
+    "balance": 100
+}
+
+
+6.
+### Negative test: Authorized user cannot deposit funds into another account's deposit
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "id": 2,
+    "balance": 100
+}
+
+
+AMOUNT TRANSFER BETWEEN ACCOUNTS
+
+
+7.
+### Positive test: Authorized user can transfer an amount between their own accounts
+### Positive test: Authorized user can transfer minimum amount
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization for sasha: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 3,
+    "amount": 0.01
+}
+
+
+8.
+### Positive test: Authorized user can transfer an amount to another user
+### Positive test: Authorized user can transfer minimum amount
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization for sasha: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 3,
+    "amount": 0.011
+}
+
+
+9.
+### Positive test: Authorized user can transfer maximum amount
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization for sasha: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 2,
+    "amount": 9999.99
+}
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 2,
+    "amount": 10000
+}
+
+
+10.
+### Negative test: Authorized user cannot transfer zero amount
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 3,
+    "amount": 0
+}
+
+
+11.
+### Negative test: Authorized user cannot transfer an amount outside the allowed range
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 3,
+    "balance": 0.0099
+}
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 2,
+    "balance": 5000.01
+}
+
+
+12.
+### Negative test: Authorized user cannot transfer an amount due to insufficient funds
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+    "senderAccountId": 1,
+    "receiverAccountId": 3,
+    "amount": 5100
+}
+
+
+USERNAME CHANGE
+
+
+13.
+### Positive test: Authorized user can change their name to a two-word name with letters only
+POST http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+  "name": "Sasha Pshe"
+}
+
+
+14.
+### Negative test: Authorized user cannot change their name to a single-word name
+POST http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+  "name": "Sasha"
+}
+
+
+15.
+### Negative test: Authorized user cannot change their name to a three-word name
+POST http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+  "name": "Sasha Pshe Java"
+}
+
+
+16.
+### Negative test: Authorized user cannot change their name to a two-word name containing digits
+POST http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+  "name": "Sasha Pshe1"
+}
+
+
+17.
+### Negative test: Authorized user cannot change their name to a two-word name containing special characters
+POST http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic c2FzaGE6U3Ryb25nMSF=
+
+{
+  "name": "Sasha Pshe%"
+}
