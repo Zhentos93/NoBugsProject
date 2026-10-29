@@ -1,4 +1,4 @@
-package automated_testing.practice_5_1_practice_ApiTestsJunior;
+package automated_testing.practice_6_1_practice_ApiTestsJunior;
 
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;

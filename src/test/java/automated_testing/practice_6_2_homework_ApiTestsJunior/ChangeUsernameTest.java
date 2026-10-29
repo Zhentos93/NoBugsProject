@@ -1,4 +1,4 @@
-package automated_testing.practice_5_2_homework_ApiTestsJunior;
+package automated_testing.practice_6_2_homework_ApiTestsJunior;
 
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -6,6 +6,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,7 +34,6 @@ public class ChangeUsernameTest {
                         .replace("-", "")
                         .substring(0, 8);
 
-        // проверяем создание авторизованного пользователя
         given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -84,6 +84,19 @@ public class ChangeUsernameTest {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK);
+
+        // проверяем, что новое имя сохранилось в профиле пользователя
+        given()
+                .header("Authorization", userAuthHeader)
+                .accept(ContentType.JSON)
+                .when()
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .body("name", Matchers.equalTo("Sasha Pshe"))
+                .body("username", Matchers.equalTo(username))
+                .body("role", Matchers.equalTo("USER"));
     }
 
     @ParameterizedTest
@@ -96,7 +109,6 @@ public class ChangeUsernameTest {
                         .replace("-", "")
                         .substring(0, 8);
 
-        // проверяем создание авторизованного пользователя
         given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -132,6 +144,19 @@ public class ChangeUsernameTest {
                 .extract()
                 .header("Authorization");
 
+        // проверяем ранее сгенерированное name и сохраняем перед следующей проверкой
+        String nameBefore = given()
+                .header("Authorization", userAuthHeader)
+                .accept(ContentType.JSON)
+                .when()
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .jsonPath()
+                .getString("name");
+
         // проверяем, что при изменении name получим BAD_REQUEST
         given()
                 .header("Authorization", userAuthHeader)
@@ -147,5 +172,20 @@ public class ChangeUsernameTest {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_BAD_REQUEST);
+
+        // проверяем, что name не изменилось
+        String nameAfter = given()
+                .header("Authorization", userAuthHeader)
+                .accept(ContentType.JSON)
+                .when()
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .jsonPath()
+                .getString("name");
+
+        Assertions.assertEquals(nameBefore, nameAfter);
     }
 }
