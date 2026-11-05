@@ -12,7 +12,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
-public class CreateAccountTest {
+public class CreateAccountJuniorTest {
     @BeforeAll
     public static void setupRestAssured() {
         RestAssured.filters(

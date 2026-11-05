@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 
-public class ChangeUsernameTest {
+public class ChangeUsernameJuniorTest {
     @BeforeAll
     public static void setupRestAssured() {
         RestAssured.filters(

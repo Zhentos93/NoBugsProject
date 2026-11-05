@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 
-public class CreateUserTest {
+public class CreateUserJuniorTest {
     @BeforeAll
     public static void setupRestAssured() {
         RestAssured.filters(
