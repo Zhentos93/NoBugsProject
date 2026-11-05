@@ -1,4 +1,4 @@
-package automated_testing.models;
+package automated_testing_api_middle.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DepositRequest extends BaseModel {
-    private long id;
-    private double balance;
+public class ChangeUsernameRequest extends BaseModel {
+    private String name;
 }

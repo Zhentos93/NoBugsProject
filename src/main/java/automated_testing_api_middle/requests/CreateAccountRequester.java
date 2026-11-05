@@ -1,24 +1,23 @@
-package automated_testing.requests;
+package automated_testing_api_middle.requests;
 
+import automated_testing_api_middle.models.BaseModel;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
-import automated_testing.models.TransferRequest;
 
 import static io.restassured.RestAssured.given;
 
-public class TransferRequester extends Request<TransferRequest> {
-    public TransferRequester(RequestSpecification requestSpecification,
-                             ResponseSpecification responseSpecification) {
+public class CreateAccountRequester extends Request {
+    public CreateAccountRequester(RequestSpecification requestSpecification,
+                                  ResponseSpecification responseSpecification) {
         super(requestSpecification, responseSpecification);
     }
 
     @Override
-    public ValidatableResponse post(TransferRequest model) {
+    public ValidatableResponse post(BaseModel model) {
         return given()
                 .spec(requestSpecification)
-                .body(model)
-                .post("/api/v1/accounts/transfer")
+                .post("/api/v1/accounts")
                 .then()
                 .assertThat()
                 .spec(responseSpecification);

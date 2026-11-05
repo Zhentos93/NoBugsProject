@@ -1,15 +1,15 @@
 package automated_testing.practice_7_2_homework_ApiTestsMiddle;
 
-import automated_testing.generators.RandomData;
-import automated_testing.models.ChangeUsernameRequest;
-import automated_testing.models.CreateUserRequest;
-import automated_testing.models.UserProfileResponse;
-import automated_testing.models.UserRole;
-import automated_testing.requests.AdminCreateUserRequester;
-import automated_testing.requests.ChangeUsernameRequester;
-import automated_testing.requests.GetProfileRequester;
-import automated_testing.specs.RequestSpecs;
-import automated_testing.specs.ResponseSpecs;
+import automated_testing_api_middle.generators.RandomData;
+import automated_testing_api_middle.models.ChangeUsernameRequest;
+import automated_testing_api_middle.models.CreateUserRequest;
+import automated_testing_api_middle.models.UserProfileResponse;
+import automated_testing_api_middle.models.UserRole;
+import automated_testing_api_middle.requests.AdminCreateUserRequester;
+import automated_testing_api_middle.requests.ChangeUsernameRequester;
+import automated_testing_api_middle.requests.GetProfileRequester;
+import automated_testing_api_middle.specs.RequestSpecs;
+import automated_testing_api_middle.specs.ResponseSpecs;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-public class ChangeUsernameMiddleTest extends BaseTest {
+public class ChangeUsernameMiddleTest extends BaseMiddleTest {
 
     @Test
     public void shouldAllowAuthorizedUserToChangeNameToTwoWordNameWithLettersOnly() {
@@ -43,16 +43,14 @@ public class ChangeUsernameMiddleTest extends BaseTest {
 
         // подготавливаем запрос на изменение имени в профиле пользователя
         ChangeUsernameRequest changeUsernameRequest = ChangeUsernameRequest.builder()
-                .name("Sasha Pshe")
+                .name(RandomData.getFullName())
                 .build();
 
         // проверяем успешное изменение имени в профиле пользователя
         new ChangeUsernameRequester(
                 userSpec,
                 ResponseSpecs.requestReturnsOK())
-                .put(ChangeUsernameRequest.builder()
-                        .name("Sasha Pshe")
-                        .build());
+                .put(changeUsernameRequest);
 
         // запрашиваем актуальные данные профиля после изменения имени
         UserProfileResponse profile = new GetProfileRequester(

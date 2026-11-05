@@ -1,4 +1,4 @@
-package automated_testing.requests;
+package automated_testing_api_middle.requests;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;

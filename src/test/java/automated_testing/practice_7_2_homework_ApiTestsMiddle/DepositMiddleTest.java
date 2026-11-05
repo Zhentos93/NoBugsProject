@@ -1,16 +1,16 @@
 package automated_testing.practice_7_2_homework_ApiTestsMiddle;
 
-import automated_testing.generators.RandomData;
-import automated_testing.models.AccountResponse;
-import automated_testing.models.CreateUserRequest;
-import automated_testing.models.DepositRequest;
-import automated_testing.models.UserRole;
-import automated_testing.requests.AdminCreateUserRequester;
-import automated_testing.requests.CreateAccountRequester;
-import automated_testing.requests.DepositRequester;
-import automated_testing.requests.GetAccountsRequester;
-import automated_testing.specs.RequestSpecs;
-import automated_testing.specs.ResponseSpecs;
+import automated_testing_api_middle.generators.RandomData;
+import automated_testing_api_middle.models.AccountResponse;
+import automated_testing_api_middle.models.CreateUserRequest;
+import automated_testing_api_middle.models.DepositRequest;
+import automated_testing_api_middle.models.UserRole;
+import automated_testing_api_middle.requests.AdminCreateUserRequester;
+import automated_testing_api_middle.requests.CreateAccountRequester;
+import automated_testing_api_middle.requests.DepositRequester;
+import automated_testing_api_middle.requests.GetAccountsRequester;
+import automated_testing_api_middle.specs.RequestSpecs;
+import automated_testing_api_middle.specs.ResponseSpecs;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-public class DepositMiddleTest extends BaseTest {
+public class DepositMiddleTest extends BaseMiddleTest {
 
     public static Stream<Arguments> minimumDepositAmounts() {
         return Stream.of(
@@ -54,7 +54,7 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse account = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -117,7 +117,7 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse account = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -172,7 +172,7 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse account = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -235,7 +235,7 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse account = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -290,14 +290,14 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse account = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
         // подготавливаем данные для пополнения несуществующего счёта пользователя
         DepositRequest depositRequest = DepositRequest.builder()
-                .id(999_999_999L)
-                .balance(100)
+                .id(RandomData.getNonExistentAccountId())
+                .balance(RandomData.getValidDepositAmount())
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
@@ -347,7 +347,7 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse firstUserAccount = new CreateAccountRequester(
                 firstUserSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -373,14 +373,14 @@ public class DepositMiddleTest extends BaseTest {
         AccountResponse secondUserAccount = new CreateAccountRequester(
                 secondUserSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
         // подготавливаем запрос с данными на пополнение счёта другого пользователя
         DepositRequest depositRequest = DepositRequest.builder()
                 .id(secondUserAccount.getId())
-                .balance(100)
+                .balance(RandomData.getValidDepositAmount())
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму

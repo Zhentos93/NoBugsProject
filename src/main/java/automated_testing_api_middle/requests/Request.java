@@ -1,6 +1,6 @@
-package automated_testing.requests;
+package automated_testing_api_middle.requests;
 
-import automated_testing.models.BaseModel;
+import automated_testing_api_middle.models.BaseModel;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -9,10 +9,13 @@ public abstract class Request<T extends BaseModel> {
     protected RequestSpecification requestSpecification;
     protected ResponseSpecification responseSpecification;
 
-    public Request(RequestSpecification requestSpecification,
-                   ResponseSpecification responseSpecification) {
+    public Request(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
         this.requestSpecification = requestSpecification;
         this.responseSpecification = responseSpecification;
+    }
+
+    public ValidatableResponse post() {
+        return post(null);
     }
 
     public abstract ValidatableResponse post(T model);

@@ -1,7 +1,7 @@
-package automated_testing.specs;
+package automated_testing_api_middle.specs;
 
-import automated_testing.models.LoginUserRequest;
-import automated_testing.requests.LoginUserRequester;
+import automated_testing_api_middle.models.LoginUserRequest;
+import automated_testing_api_middle.requests.LoginUserRequester;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;

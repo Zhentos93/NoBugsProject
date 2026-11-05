@@ -1,4 +1,4 @@
-package automated_testing.models;
+package automated_testing_api_middle.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

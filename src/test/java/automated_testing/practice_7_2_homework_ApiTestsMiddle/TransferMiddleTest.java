@@ -1,18 +1,18 @@
 package automated_testing.practice_7_2_homework_ApiTestsMiddle;
 
-import automated_testing.generators.RandomData;
-import automated_testing.models.AccountResponse;
-import automated_testing.models.CreateUserRequest;
-import automated_testing.models.DepositRequest;
-import automated_testing.models.TransferRequest;
-import automated_testing.models.UserRole;
-import automated_testing.requests.AdminCreateUserRequester;
-import automated_testing.requests.CreateAccountRequester;
-import automated_testing.requests.DepositRequester;
-import automated_testing.requests.GetAccountsRequester;
-import automated_testing.requests.TransferRequester;
-import automated_testing.specs.RequestSpecs;
-import automated_testing.specs.ResponseSpecs;
+import automated_testing_api_middle.generators.RandomData;
+import automated_testing_api_middle.models.AccountResponse;
+import automated_testing_api_middle.models.CreateUserRequest;
+import automated_testing_api_middle.models.DepositRequest;
+import automated_testing_api_middle.models.TransferRequest;
+import automated_testing_api_middle.models.UserRole;
+import automated_testing_api_middle.requests.AdminCreateUserRequester;
+import automated_testing_api_middle.requests.CreateAccountRequester;
+import automated_testing_api_middle.requests.DepositRequester;
+import automated_testing_api_middle.requests.GetAccountsRequester;
+import automated_testing_api_middle.requests.TransferRequester;
+import automated_testing_api_middle.specs.RequestSpecs;
+import automated_testing_api_middle.specs.ResponseSpecs;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.within;
 
-public class TransferMiddleTest extends BaseTest {
+public class TransferMiddleTest extends BaseMiddleTest {
 
     @Test
     public void shouldAllowAuthorizedUserToTransferMinimumAmountBetweenOwnAccounts() {
@@ -51,7 +51,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse senderAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -60,9 +60,12 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse receiverAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
+
+        double initialBalance = RandomData.getAmount(100.0, 5000.0);
+        double transferAmount = 0.01;
 
         // проверяем успешное пополнение счёта, с которого будем переводить переданную сумму
         new DepositRequester(
@@ -70,7 +73,7 @@ public class TransferMiddleTest extends BaseTest {
                 ResponseSpecs.requestReturnsOK())
                 .post(DepositRequest.builder()
                         .id(senderAccount.getId())
-                        .balance(100)
+                        .balance(initialBalance)
                         .build());
 
         // проверяем успешный перевод на переданную сумму
@@ -80,7 +83,7 @@ public class TransferMiddleTest extends BaseTest {
                 .post(TransferRequest.builder()
                         .senderAccountId(senderAccount.getId())
                         .receiverAccountId(receiverAccount.getId())
-                        .amount(0.01)
+                        .amount(transferAmount)
                         .build());
 
         // запрашиваем актуальные счета пользователя после перевода
@@ -96,8 +99,10 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse actualReceiverAccount = findAccountById(accounts, receiverAccount.getId());
 
         // проверяем списание суммы с счёта, с которого переводили и её зачисление на счёт, на который переводили
-        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(99.99);
-        softly.assertThat(actualReceiverAccount.getBalance()).isEqualTo(0.01);
+        softly.assertThat(actualSenderAccount.getBalance())
+                .isCloseTo(initialBalance - transferAmount, within(0.000001));
+        softly.assertThat(actualReceiverAccount.getBalance())
+                .isCloseTo(transferAmount, within(0.000001));
     }
 
     @Test
@@ -125,7 +130,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse senderAccount = new CreateAccountRequester(
                 senderUserSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -151,9 +156,12 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse receiverAccount = new CreateAccountRequester(
                 receiverUserSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
+
+        double initialBalance = RandomData.getAmount(100.0, 5000.0);
+        double transferAmount = 0.01;
 
         // проверяем успешное пополнение счёта-отправителя на переданную сумму
         new DepositRequester(
@@ -161,7 +169,7 @@ public class TransferMiddleTest extends BaseTest {
                 ResponseSpecs.requestReturnsOK())
                 .post(DepositRequest.builder()
                         .id(senderAccount.getId())
-                        .balance(100)
+                        .balance(initialBalance)
                         .build());
 
         // проверяем успешный перевод денег получателю на переданную сумму
@@ -171,7 +179,7 @@ public class TransferMiddleTest extends BaseTest {
                 .post(TransferRequest.builder()
                         .senderAccountId(senderAccount.getId())
                         .receiverAccountId(receiverAccount.getId())
-                        .amount(0.011)
+                        .amount(transferAmount)
                         .build());
 
         // находим счета отправителя и получателя в актуальном списке счетов по их ID
@@ -190,8 +198,10 @@ public class TransferMiddleTest extends BaseTest {
                 .as(AccountResponse[].class);
 
         // проверяем списание суммы со счёта отправителя и её зачисление на счёт получателя
-        softly.assertThat(senderAccounts[0].getBalance()).isEqualTo(99.989);
-        softly.assertThat(receiverAccounts[0].getBalance()).isEqualTo(0.011);
+        softly.assertThat(senderAccounts[0].getBalance())
+                .isCloseTo(initialBalance - transferAmount, within(0.000001));
+        softly.assertThat(receiverAccounts[0].getBalance())
+                .isCloseTo(transferAmount, within(0.000001));
     }
 
     public static Stream<Arguments> maximumTransferAmounts() {
@@ -231,7 +241,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse senderAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -240,7 +250,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse receiverAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -314,7 +324,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse senderAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -323,9 +333,11 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse receiverAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
+
+        double initialBalance = RandomData.getAmount(100.0, 5000.0);
 
         // проверяем успешное пополнение счёта, с которого будем переводить переданную сумму
         new DepositRequester(
@@ -333,7 +345,7 @@ public class TransferMiddleTest extends BaseTest {
                 ResponseSpecs.requestReturnsOK())
                 .post(DepositRequest.builder()
                         .id(senderAccount.getId())
-                        .balance(100)
+                        .balance(initialBalance)
                         .build());
 
         // проверяем неуспешный перевод на переданную сумму
@@ -360,8 +372,8 @@ public class TransferMiddleTest extends BaseTest {
 
         // проверяем неуспешное списание суммы с счёта, с которого переводили и её неуспешное зачисление на счёт,
         // на который переводили
-        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(100.0);
-        softly.assertThat(actualReceiverAccount.getBalance()).isEqualTo(0.0);
+        softly.assertThat(actualSenderAccount.getBalance()).isCloseTo(initialBalance, within(0.000001));
+        softly.assertThat(actualReceiverAccount.getBalance()).isCloseTo(0.0, within(0.000001));
     }
 
     public static Stream<Arguments> transferAmountsOutsideAllowedRange() {
@@ -398,7 +410,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse senderAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -407,7 +419,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse receiverAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -490,7 +502,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse senderAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
@@ -499,7 +511,7 @@ public class TransferMiddleTest extends BaseTest {
         AccountResponse receiverAccount = new CreateAccountRequester(
                 userSpec,
                 ResponseSpecs.entityWasCreated())
-                .post(null)
+                .post()
                 .extract()
                 .as(AccountResponse.class);
 
