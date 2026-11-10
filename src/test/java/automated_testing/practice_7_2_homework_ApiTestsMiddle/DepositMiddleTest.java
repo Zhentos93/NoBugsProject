@@ -33,27 +33,21 @@ public class DepositMiddleTest extends BaseMiddleTest {
     public void shouldAllowAuthorizedUserToDepositMinimumAmount(double amount) {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
-        AccountResponse account = new CreateAccountRequester(
-                userSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse account = new CreateAccountRequester(userSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
@@ -65,15 +59,11 @@ public class DepositMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем успешное пополнение счёта на переданную сумму
-        new DepositRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        new DepositRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
-        AccountResponse[] accounts = new GetAccountsRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] accounts = new GetAccountsRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
@@ -96,27 +86,21 @@ public class DepositMiddleTest extends BaseMiddleTest {
     public void shouldAllowAuthorizedUserToDepositMaximumAmount(double amount) {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
-        AccountResponse account = new CreateAccountRequester(
-                userSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse account = new CreateAccountRequester(userSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
@@ -128,15 +112,11 @@ public class DepositMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем успешное пополнение счёта на переданную сумму
-        new DepositRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        new DepositRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
-        AccountResponse[] accounts = new GetAccountsRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] accounts = new GetAccountsRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
@@ -151,27 +131,21 @@ public class DepositMiddleTest extends BaseMiddleTest {
     public void shouldPreventAuthorizedUserFromDepositingZeroAmount() {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
-        AccountResponse account = new CreateAccountRequester(
-                userSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse account = new CreateAccountRequester(userSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
@@ -183,15 +157,11 @@ public class DepositMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new DepositRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsBadRequest())
+        new DepositRequester(userSpec, ResponseSpecs.requestReturnsBadRequest())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
-        AccountResponse[] accounts = new GetAccountsRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] accounts = new GetAccountsRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
@@ -214,27 +184,21 @@ public class DepositMiddleTest extends BaseMiddleTest {
     public void shouldPreventAuthorizedUserFromDepositingAmountOutsideAllowedRange(double amount) {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
-        AccountResponse account = new CreateAccountRequester(
-                userSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse account = new CreateAccountRequester(userSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
@@ -246,15 +210,11 @@ public class DepositMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new DepositRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsBadRequest())
+        new DepositRequester(userSpec, ResponseSpecs.requestReturnsBadRequest())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
-        AccountResponse[] accounts = new GetAccountsRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] accounts = new GetAccountsRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
@@ -269,27 +229,21 @@ public class DepositMiddleTest extends BaseMiddleTest {
     public void shouldPreventAuthorizedUserFromFundingNonExistentDeposit() {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
-        AccountResponse account = new CreateAccountRequester(
-                userSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse account = new CreateAccountRequester(userSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
@@ -301,15 +255,11 @@ public class DepositMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new DepositRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsForbidden())
+        new DepositRequester(userSpec, ResponseSpecs.requestReturnsForbidden())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
-        AccountResponse[] accounts = new GetAccountsRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] accounts = new GetAccountsRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
@@ -324,55 +274,47 @@ public class DepositMiddleTest extends BaseMiddleTest {
     public void shouldPreventAuthorizedUserFromDepositingFundsIntoAnotherAccountsDeposit() {
 
         // подготавливаем данные нового пользователя, от имени которого будем пополнять счёт
-        CreateUserRequest firstUserRequest = CreateUserRequest.builder()
+        CreateUserRequest firstUser = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя, от имени которого будем пополнять счёт
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(firstUserRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(firstUser);
 
         // проверяем авторизацию созданного пользователя, от имени которого будем пополнять счёт
         // и сохраняем спецификацию с его токеном
         RequestSpecification firstUserSpec = RequestSpecs.authAsUser(
-                firstUserRequest.getUsername(),
-                firstUserRequest.getPassword());
+                firstUser.getUsername(),
+                firstUser.getPassword());
 
         // проверяем создание счёта авторизованным пользователем, от имени которого будем пополнять счёт
         // и сохраняем данные созданного счёта
-        AccountResponse firstUserAccount = new CreateAccountRequester(
-                firstUserSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse firstUserAccount = new CreateAccountRequester(firstUserSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
 
         // подготавливаем данные нового пользователя, чей счёт будем пополнять
-        CreateUserRequest secondUserRequest = CreateUserRequest.builder()
+        CreateUserRequest secondUser = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя, чей счёт будем пополнять
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(secondUserRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(secondUser);
 
         // проверяем авторизацию созданного пользователя, чей счёт будем пополнять
         RequestSpecification secondUserSpec = RequestSpecs.authAsUser(
-                secondUserRequest.getUsername(),
-                secondUserRequest.getPassword());
+                secondUser.getUsername(),
+                secondUser.getPassword());
 
         // проверяем создание счёта авторизованным пользователем, чей счёт будем пополнять
-        AccountResponse secondUserAccount = new CreateAccountRequester(
-                secondUserSpec,
-                ResponseSpecs.entityWasCreated())
+        AccountResponse secondUserAccount = new CreateAccountRequester(secondUserSpec, ResponseSpecs.entityWasCreated())
                 .post()
                 .extract()
                 .as(AccountResponse.class);
@@ -384,23 +326,17 @@ public class DepositMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new DepositRequester(
-                firstUserSpec,
-                ResponseSpecs.requestReturnsForbidden())
+        new DepositRequester(firstUserSpec, ResponseSpecs.requestReturnsForbidden())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения, от имени которого пытались пополнить счёт
-        AccountResponse[] firstUserAccounts = new GetAccountsRequester(
-                firstUserSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] firstUserAccounts = new GetAccountsRequester(firstUserSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
 
         // запрашиваем актуальные счета пользователя после пополнения, чей счёт пытались пополнять
-        AccountResponse[] secondUserAccounts = new GetAccountsRequester(
-                secondUserSpec,
-                ResponseSpecs.requestReturnsOK())
+        AccountResponse[] secondUserAccounts = new GetAccountsRequester(secondUserSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(AccountResponse[].class);
