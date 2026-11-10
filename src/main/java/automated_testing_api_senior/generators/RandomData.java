@@ -40,4 +40,60 @@ public class RandomData {
     public static long getNonExistentAccountId() {
         return 1_000_000_000L + RANDOM.nextInt(1_000_000_000);
     }
+
+    public static double[] getDepositAmountsForTotal(double totalAmount) {
+        double firstMin = Math.max(MIN_DEPOSIT_AMOUNT, totalAmount - 2 * MAX_DEPOSIT_AMOUNT);
+
+        double firstMax = Math.min(MAX_DEPOSIT_AMOUNT, totalAmount - 2 * MIN_DEPOSIT_AMOUNT);
+
+        double firstDepositAmount = getAmount(firstMin, firstMax);
+
+        double remainingAmount = roundAmount(totalAmount - firstDepositAmount);
+
+        double secondMin = Math.max(MIN_DEPOSIT_AMOUNT, remainingAmount - MAX_DEPOSIT_AMOUNT);
+
+        double secondMax = Math.min(MAX_DEPOSIT_AMOUNT, remainingAmount - MIN_DEPOSIT_AMOUNT);
+
+        double secondDepositAmount = getAmount(secondMin, secondMax);
+
+        double thirdDepositAmount = roundAmount(remainingAmount - secondDepositAmount);
+
+        return new double[]{
+                firstDepositAmount, secondDepositAmount, thirdDepositAmount
+        };
+    }
+
+    private static double roundAmount(double amount) {
+        return Math.round(amount * 1000.0) / 1000.0;
+    }
+
+    public static String getFullName() {
+        return getNameWord() + " " + getNameWord();
+    }
+
+    private static final String SPECIAL_CHARACTERS = "!@#$%^&*";
+
+    private static String getNameWord() {
+        int wordLength = 3 + RANDOM.nextInt(8);
+
+        return RandomStringUtils.secure().nextAlphabetic(wordLength);
+    }
+
+    public static String getOneWordName() {
+        return getNameWord();
+    }
+
+    public static String getThreeWordName() {
+        return getNameWord() + " " + getNameWord() + " " + getNameWord();
+    }
+
+    public static String getNameWithDigit() {
+        return getFullName() + RandomStringUtils.secure().nextNumeric(1);
+    }
+
+    public static String getNameWithSpecialCharacter() {
+        char specialCharacter = SPECIAL_CHARACTERS.charAt(RANDOM.nextInt(SPECIAL_CHARACTERS.length()));
+
+        return getFullName() + specialCharacter;
+    }
 }
