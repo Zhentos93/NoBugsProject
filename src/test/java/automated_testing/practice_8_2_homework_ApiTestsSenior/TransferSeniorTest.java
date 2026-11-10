@@ -17,13 +17,15 @@ import java.util.stream.Stream;
 
 public class TransferSeniorTest extends BaseSeniorTest {
 
+    private static final double MAX_TRANSFER_AMOUNT = 10000.0;
+
     @Test
     public void shouldAllowAuthorizedUserToTransferMinimumAmountBetweenOwnAccounts() {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта, с которого будем
         // переводить сумму
@@ -47,6 +49,8 @@ public class TransferSeniorTest extends BaseSeniorTest {
                 transferAmount,
                 ResponseSpecs.requestReturnsOK());
 
+        double expectedSenderBalance = initialBalance - transferAmount;
+
         // запрашиваем актуальные счета пользователя после перевода
         CreateAccountResponse[] accounts = AccountSteps.getAccounts(userSpec);
 
@@ -55,30 +59,30 @@ public class TransferSeniorTest extends BaseSeniorTest {
         CreateAccountResponse actualReceiverAccount = AccountSteps.findAccountById(accounts, receiverAccount.getId());
 
         // проверяем списание суммы с счёта, с которого переводили и её зачисление на счёт, на который переводили
-        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(initialBalance - transferAmount);
+        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(expectedSenderBalance);
         softly.assertThat(actualReceiverAccount.getBalance()).isEqualTo(transferAmount);
     }
 
     @Test
     public void shouldAllowAuthorizedUserToTransferMinimumAmountToAnotherUsersAccount() {
         // проверяем создание админом пользователя-отправителя
-        CreateUserRequest senderUserRequest = AdminSteps.createUser();
+        CreateUserRequest senderUser = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя-отправителя и сохраняем спецификацию с его токеном
         RequestSpecification senderUserSpec = RequestSpecs.authAsUser(
-                senderUserRequest.getUsername(),
-                senderUserRequest.getPassword());
+                senderUser.getUsername(),
+                senderUser.getPassword());
 
         // проверяем создание счёта авторизованным пользователем-отправителем и сохраняем данные созданного счёта
         CreateAccountResponse senderAccount = AccountSteps.createAccount(senderUserSpec);
 
         // проверяем создание админом пользователя-получателя
-        CreateUserRequest receiverUserRequest = AdminSteps.createUser();
+        CreateUserRequest receiverUser = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя-получателя и сохраняем спецификацию с его токеном
         RequestSpecification receiverUserSpec = RequestSpecs.authAsUser(
-                receiverUserRequest.getUsername(),
-                receiverUserRequest.getPassword());
+                receiverUser.getUsername(),
+                receiverUser.getPassword());
 
         // проверяем создание счёта авторизованным пользователем-получателем и сохраняем данные созданного счёта
         CreateAccountResponse receiverAccount = AccountSteps.createAccount(receiverUserSpec);
@@ -97,6 +101,8 @@ public class TransferSeniorTest extends BaseSeniorTest {
                 transferAmount,
                 ResponseSpecs.requestReturnsOK());
 
+        double expectedSenderBalance = initialBalance - transferAmount;
+
         // находим счета отправителя и получателя в актуальном списке счетов по их ID
         CreateAccountResponse actualSenderAccount = AccountSteps.findAccountById(
                 AccountSteps.getAccounts(senderUserSpec),
@@ -107,7 +113,7 @@ public class TransferSeniorTest extends BaseSeniorTest {
                 receiverAccount.getId());
 
         // проверяем списание суммы со счёта отправителя и её зачисление на счёт получателя
-        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(initialBalance - transferAmount);
+        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(expectedSenderBalance);
         softly.assertThat(actualReceiverAccount.getBalance()).isEqualTo(transferAmount);
     }
 
@@ -122,10 +128,10 @@ public class TransferSeniorTest extends BaseSeniorTest {
     @ParameterizedTest
     public void shouldAllowAuthorizedUserToTransferMaximumAmount(double transferAmount) {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта, с которого будем
         // переводить сумму
@@ -135,14 +141,12 @@ public class TransferSeniorTest extends BaseSeniorTest {
         // переводить сумму
         CreateAccountResponse receiverAccount = AccountSteps.createAccount(userSpec);
 
-        double firstDeposit = RandomData.getAmount(2500.0, 4999.0);
-        double secondDeposit = RandomData.getAmount(5000.01 - firstDeposit, 4999.0);
-        double thirdDeposit = 10000.0 - firstDeposit - secondDeposit;
+        double[] depositAmounts = RandomData.getDepositAmountsForTotal(transferAmount);
 
         // проверяем успешное пополнение счёта, с которого будем переводить переданную сумму
-        AccountSteps.deposit(userSpec, senderAccount.getId(), firstDeposit);
-        AccountSteps.deposit(userSpec, senderAccount.getId(), secondDeposit);
-        AccountSteps.deposit(userSpec, senderAccount.getId(), thirdDeposit);
+        for (double depositAmount : depositAmounts) {
+            AccountSteps.deposit(userSpec, senderAccount.getId(), depositAmount);
+        }
 
         // проверяем успешный перевод на переданную сумму
         AccountSteps.transfer(
@@ -160,17 +164,17 @@ public class TransferSeniorTest extends BaseSeniorTest {
         CreateAccountResponse actualReceiverAccount = AccountSteps.findAccountById(accounts, receiverAccount.getId());
 
         // проверяем списание суммы с счёта, с которого переводили и её зачисление на счёт, на который переводили
-        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(10000.0 - transferAmount);
+        softly.assertThat(actualSenderAccount.getBalance()).isEqualTo(0.0);
         softly.assertThat(actualReceiverAccount.getBalance()).isEqualTo(transferAmount);
     }
 
     @Test
     public void shouldPreventAuthorizedUserFromTransferringZeroAmount() {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта, с которого будем
         // переводить сумму
@@ -217,10 +221,10 @@ public class TransferSeniorTest extends BaseSeniorTest {
     @ParameterizedTest
     public void shouldPreventAuthorizedUserFromTransferringAmountOutsideAllowedRange(double transferAmount) {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта, с которого будем
         // переводить сумму
@@ -231,17 +235,15 @@ public class TransferSeniorTest extends BaseSeniorTest {
         CreateAccountResponse receiverAccount = AccountSteps.createAccount(userSpec);
 
         double initialBalance;
-        if (transferAmount > 10000.0) {
-            double firstDeposit = RandomData.getAmount(4000.0, 5000.0);
-            double secondDeposit = RandomData.getAmount(4000.0, 5000.0);
-            double thirdDeposit = RandomData.getAmount(4000.0, 5000.0);
-            initialBalance = firstDeposit + secondDeposit + thirdDeposit;
 
-            AccountSteps.deposit(userSpec, senderAccount.getId(), firstDeposit);
-            AccountSteps.deposit(userSpec, senderAccount.getId(), secondDeposit);
-            AccountSteps.deposit(userSpec, senderAccount.getId(), thirdDeposit);
+        if (transferAmount > MAX_TRANSFER_AMOUNT) {
+            initialBalance = transferAmount;
+
+            double[] depositAmounts = RandomData.getDepositAmountsForTotal(initialBalance);
+
+            AccountSteps.depositAll(userSpec, senderAccount.getId(), depositAmounts);
         } else {
-            initialBalance = RandomData.getAmount(100.0, 5000.0);
+            initialBalance = RandomData.getValidDepositAmount();
 
             // проверяем успешное пополнение счёта, с которого будем переводить переданную сумму
             AccountSteps.deposit(userSpec, senderAccount.getId(), initialBalance);
@@ -271,10 +273,10 @@ public class TransferSeniorTest extends BaseSeniorTest {
     @Test
     public void shouldPreventAuthorizedUserFromTransferringAmountDueToInsufficientFunds() {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта, с которого будем
         // переводить сумму
