@@ -18,19 +18,22 @@ import java.util.stream.Stream;
 public class CreateUserMiddleTest extends BaseMiddleTest {
     @Test
     public void adminCanCreateUserWithCorrectData() {
-        CreateUserRequest createUserRequest = CreateUserRequest.builder()
+
+        // подготавливаем данные нового пользователя
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
-        CreateUserResponse createUserResponse = new AdminCreateUserRequester(RequestSpecs.adminSpec(),
+        CreateUserResponse userResponse = new AdminCreateUserRequester(
+                RequestSpecs.adminSpec(),
                 ResponseSpecs.entityWasCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+                .post(user).extract().as(CreateUserResponse.class);
 
-        softly.assertThat(createUserRequest.getUsername()).isEqualTo(createUserResponse.getUsername());
-        softly.assertThat(createUserRequest.getPassword()).isNotEqualTo(createUserResponse.getPassword());
-        softly.assertThat(createUserRequest.getRole()).isEqualTo(createUserResponse.getRole());
+        softly.assertThat(user.getUsername()).isEqualTo(userResponse.getUsername());
+        softly.assertThat(user.getPassword()).isNotEqualTo(userResponse.getPassword());
+        softly.assertThat(user.getRole()).isEqualTo(userResponse.getRole());
     }
 
     public static Stream<Arguments> userInvalidData() {
@@ -55,14 +58,16 @@ public class CreateUserMiddleTest extends BaseMiddleTest {
             String role,
             String errorKey,
             String errorValue) {
-        CreateUserRequest createUserRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(username)
                 .password(password)
                 .role(role)
                 .build();
 
-        new AdminCreateUserRequester(RequestSpecs.adminSpec(),
+        // проверяем неуспешное создание админом пользователя
+        new AdminCreateUserRequester(
+                RequestSpecs.adminSpec(),
                 ResponseSpecs.requestReturnsBadRequest(errorKey, errorValue))
-                .post(createUserRequest);
+                .post(user);
     }
 }

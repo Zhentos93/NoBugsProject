@@ -24,22 +24,18 @@ public class ChangeUsernameMiddleTest extends BaseMiddleTest {
     public void shouldAllowAuthorizedUserToChangeNameToTwoWordNameWithLettersOnly() {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // подготавливаем запрос на изменение имени в профиле пользователя
         ChangeUsernameRequest changeUsernameRequest = ChangeUsernameRequest.builder()
@@ -47,21 +43,17 @@ public class ChangeUsernameMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем успешное изменение имени в профиле пользователя
-        new ChangeUsernameRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        new ChangeUsernameRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .put(changeUsernameRequest);
 
         // запрашиваем актуальные данные профиля после изменения имени
-        UserProfileResponse profile = new GetProfileRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        UserProfileResponse profile = new GetProfileRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(UserProfileResponse.class);
 
         // проверяем данные профиля после успешного изменения имени
-        softly.assertThat(profile.getUsername()).isEqualTo(userRequest.getUsername());
+        softly.assertThat(profile.getUsername()).isEqualTo(user.getUsername());
         softly.assertThat(profile.getRole()).isEqualTo(UserRole.USER.toString());
         softly.assertThat(profile.getName()).isEqualTo(changeUsernameRequest.getName());
     }
@@ -80,27 +72,21 @@ public class ChangeUsernameMiddleTest extends BaseMiddleTest {
     public void shouldPreventAuthorizedUserFromChangingNameToInvalidName(String invalidName) {
 
         // подготавливаем данные нового пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .username(RandomData.getUsername())
                 .password(RandomData.getPassword())
                 .role(UserRole.USER.toString())
                 .build();
 
         // проверяем создание админом пользователя
-        new AdminCreateUserRequester(
-                RequestSpecs.adminSpec(),
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);
+        new AdminCreateUserRequester(RequestSpecs.adminSpec(), ResponseSpecs.entityWasCreated())
+                .post(user);
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(
-                userRequest.getUsername(),
-                userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // запрашиваем и сохраняем исходные данные профиля до попытки изменить имя
-        UserProfileResponse profileBeforeRequest = new GetProfileRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        UserProfileResponse profileBeforeRequest = new GetProfileRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(UserProfileResponse.class);
@@ -111,15 +97,11 @@ public class ChangeUsernameMiddleTest extends BaseMiddleTest {
                 .build();
 
         // проверяем неуспешное изменение имени в профиле пользователя
-        new ChangeUsernameRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsBadRequest())
+        new ChangeUsernameRequester(userSpec, ResponseSpecs.requestReturnsBadRequest())
                 .put(changeUsernameRequest);
 
         // повторно запрашиваем данные профиля после отклонённого запроса
-        UserProfileResponse profileAfterRequest = new GetProfileRequester(
-                userSpec,
-                ResponseSpecs.requestReturnsOK())
+        UserProfileResponse profileAfterRequest = new GetProfileRequester(userSpec, ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(UserProfileResponse.class);
