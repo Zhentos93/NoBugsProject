@@ -13,7 +13,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
-public class LoginUserTest {
+public class LoginUserJuniorTest {
     @BeforeAll
     public static void setupRestAssured() {
         RestAssured.filters(
