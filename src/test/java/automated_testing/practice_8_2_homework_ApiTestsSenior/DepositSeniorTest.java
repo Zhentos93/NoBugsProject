@@ -32,10 +32,10 @@ public class DepositSeniorTest extends BaseSeniorTest {
     @ParameterizedTest
     public void shouldAllowAuthorizedUserToDepositMinimumAmount(double amount) {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
         CreateAccountResponse account = AccountSteps.createAccount(userSpec);
@@ -47,10 +47,7 @@ public class DepositSeniorTest extends BaseSeniorTest {
                 .build();
 
         // проверяем успешное пополнение счёта на переданную сумму
-        new CrudRequester(
-                userSpec,
-                Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsOK())
+        new CrudRequester(userSpec, Endpoint.DEPOSIT, ResponseSpecs.requestReturnsOK())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
@@ -73,10 +70,10 @@ public class DepositSeniorTest extends BaseSeniorTest {
     @ParameterizedTest
     public void shouldAllowAuthorizedUserToDepositMaximumAmount(double amount) {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
         CreateAccountResponse account = AccountSteps.createAccount(userSpec);
@@ -88,10 +85,7 @@ public class DepositSeniorTest extends BaseSeniorTest {
                 .build();
 
         // проверяем успешное пополнение счёта на переданную сумму
-        new CrudRequester(
-                userSpec,
-                Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsOK())
+        new CrudRequester(userSpec, Endpoint.DEPOSIT, ResponseSpecs.requestReturnsOK())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
@@ -106,10 +100,10 @@ public class DepositSeniorTest extends BaseSeniorTest {
     @Test
     public void shouldPreventAuthorizedUserFromDepositingZeroAmount() {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
         CreateAccountResponse account = AccountSteps.createAccount(userSpec);
@@ -121,10 +115,7 @@ public class DepositSeniorTest extends BaseSeniorTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new CrudRequester(
-                userSpec,
-                Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsBadRequest())
+        new CrudRequester(userSpec, Endpoint.DEPOSIT, ResponseSpecs.requestReturnsBadRequest())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
@@ -147,10 +138,10 @@ public class DepositSeniorTest extends BaseSeniorTest {
     @ParameterizedTest
     public void shouldPreventAuthorizedUserFromDepositingAmountOutsideAllowedRange(double amount) {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
         CreateAccountResponse account = AccountSteps.createAccount(userSpec);
@@ -162,10 +153,7 @@ public class DepositSeniorTest extends BaseSeniorTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new CrudRequester(
-                userSpec,
-                Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsBadRequest())
+        new CrudRequester(userSpec, Endpoint.DEPOSIT, ResponseSpecs.requestReturnsBadRequest())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
@@ -180,10 +168,10 @@ public class DepositSeniorTest extends BaseSeniorTest {
     @Test
     public void shouldPreventAuthorizedUserFromFundingNonExistentDeposit() {
         // проверяем создание админом пользователя
-        CreateUserRequest userRequest = AdminSteps.createUser();
+        CreateUserRequest user = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя и сохраняем спецификацию с его токеном
-        RequestSpecification userSpec = RequestSpecs.authAsUser(userRequest.getUsername(), userRequest.getPassword());
+        RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
         // проверяем создание счёта авторизованным пользователем и сохраняем данные созданного счёта
         CreateAccountResponse account = AccountSteps.createAccount(userSpec);
@@ -196,10 +184,7 @@ public class DepositSeniorTest extends BaseSeniorTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new CrudRequester(
-                userSpec,
-                Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsForbidden())
+        new CrudRequester(userSpec, Endpoint.DEPOSIT, ResponseSpecs.requestReturnsForbidden())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения
@@ -214,25 +199,25 @@ public class DepositSeniorTest extends BaseSeniorTest {
     @Test
     public void shouldPreventAuthorizedUserFromDepositingFundsIntoAnotherAccountsDeposit() {
         // проверяем создание админом пользователя, от имени которого будем пополнять счёт
-        CreateUserRequest firstUserRequest = AdminSteps.createUser();
+        CreateUserRequest firstUser = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя, от имени которого будем пополнять счёт
         // и сохраняем спецификацию с его токеном
         RequestSpecification firstUserSpec = RequestSpecs.authAsUser(
-                firstUserRequest.getUsername(),
-                firstUserRequest.getPassword());
+                firstUser.getUsername(),
+                firstUser.getPassword());
 
         // проверяем создание счёта авторизованным пользователем, от имени которого будем пополнять счёт
         // и сохраняем данные созданного счёта
         CreateAccountResponse firstUserAccount = AccountSteps.createAccount(firstUserSpec);
 
         // проверяем создание админом пользователя, чей счёт будем пополнять
-        CreateUserRequest secondUserRequest = AdminSteps.createUser();
+        CreateUserRequest secondUser = AdminSteps.createUser();
 
         // проверяем авторизацию созданного пользователя, чей счёт будем пополнять
         RequestSpecification secondUserSpec = RequestSpecs.authAsUser(
-                secondUserRequest.getUsername(),
-                secondUserRequest.getPassword());
+                secondUser.getUsername(),
+                secondUser.getPassword());
 
         // проверяем создание счёта авторизованным пользователем, чей счёт будем пополнять
         CreateAccountResponse secondUserAccount = AccountSteps.createAccount(secondUserSpec);
@@ -244,10 +229,7 @@ public class DepositSeniorTest extends BaseSeniorTest {
                 .build();
 
         // проверяем неуспешное пополнение счёта на переданную сумму
-        new CrudRequester(
-                firstUserSpec,
-                Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsForbidden())
+        new CrudRequester(firstUserSpec, Endpoint.DEPOSIT, ResponseSpecs.requestReturnsForbidden())
                 .post(depositRequest);
 
         // запрашиваем актуальные счета пользователя после пополнения, от имени которого пытались пополнить счёт

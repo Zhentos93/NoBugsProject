@@ -3,6 +3,7 @@ package automated_testing_api_senior.requests.steps;
 import automated_testing_api_senior.models.CreateAccountResponse;
 import automated_testing_api_senior.models.DepositRequest;
 import automated_testing_api_senior.models.TransferRequest;
+import automated_testing_api_senior.models.UserProfileResponse;
 import automated_testing_api_senior.requests.skelethon.Endpoint;
 import automated_testing_api_senior.requests.skelethon.requesters.CrudRequester;
 import automated_testing_api_senior.requests.skelethon.requesters.ValidatedCrudRequester;
@@ -35,6 +36,12 @@ public class AccountSteps {
                 .post(depositRequest);
     }
 
+    public static void depositAll(RequestSpecification userSpec, long accountId, double[] depositAmounts) {
+        for (double depositAmount : depositAmounts) {
+            deposit(userSpec, accountId, depositAmount);
+        }
+    }
+
     public static void transfer(
             RequestSpecification userSpec,
             long senderAccountId,
@@ -62,6 +69,16 @@ public class AccountSteps {
                 .get()
                 .extract()
                 .as(CreateAccountResponse[].class);
+    }
+
+    public static UserProfileResponse getProfile(RequestSpecification userSpec) {
+        return new CrudRequester(
+                userSpec,
+                Endpoint.CUSTOMER_PROFILE,
+                ResponseSpecs.requestReturnsOK())
+                .get()
+                .extract()
+                .as(UserProfileResponse.class);
     }
 
     public static CreateAccountResponse findAccountById(CreateAccountResponse[] accounts, long accountId) {
