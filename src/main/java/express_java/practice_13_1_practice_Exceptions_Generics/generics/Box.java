@@ -1,0 +1,13 @@
+package express_java.practice_13_1_practice_Exceptions_Generics.generics;
+
+public class Box<T> {
+    private T element;
+
+    public void setElement(T element) {
+        this.element = element;
+    }
+
+    public T getElement() {
+        return this.element;
+    }
+}
