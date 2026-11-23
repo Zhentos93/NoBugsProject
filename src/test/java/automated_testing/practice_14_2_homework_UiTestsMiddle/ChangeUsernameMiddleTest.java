@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
+    private static final String INITIAL_NAME = "Noname";
+    private static final String VALID_NAME = "Ivan Ivanov";
+    private static final String INVALID_NAME = "Ivan1 Ivanov";
 
     @Test
     public void userCanChangeNameToValidNameTest() {
@@ -30,8 +33,6 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
 
         // ПРОВЕРКА UI-ШАГОВ И РЕЗУЛЬТАТА ЧЕРЕЗ API \\
 
-        final String initialName = "Noname";
-        final String newName = "Ivan Ivanov";
         final String expectedUsername = profileBeforeChange.getUsername();
 
         // проверяем авторизацию пользователя через localStorage
@@ -40,7 +41,7 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
         // проверяем открытие Dashboard и неизменённый username в шапке профиля
         UserDashboard userDashboard = new UserDashboard()
                 .open()
-                .checkProfile(initialName, expectedUsername);
+                .checkProfile(INITIAL_NAME, expectedUsername);
 
         // проверяем переход на страницу редактирования профиля и ожидание загрузки исходного профиля
         EditProfilePage editProfilePage = userDashboard
@@ -49,7 +50,7 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
                 .waitUntilProfileIsLoaded();
 
         // проверяем ввод допустимого name из двух слов, состоящих только из букв и сохранение значения в поле
-        editProfilePage.enterName(newName).checkEnteredName(newName);
+        editProfilePage.enterName(VALID_NAME).checkEnteredName(VALID_NAME);
 
         // проверяем отправку нового name через UI и успешный alert изменения name
         editProfilePage.saveChanges().checkAlertMessageAndAccept(BankAlert.NAME_UPDATED_SUCCESSFULLY.getMessage());
@@ -58,12 +59,12 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
         UserProfileResponse profileAfterChange = AccountSteps.getProfile(userSpec);
 
         // проверяем через API новое name и неизменённый username
-        assertThat(profileAfterChange.getName()).isEqualTo(newName);
+        assertThat(profileAfterChange.getName()).isEqualTo(VALID_NAME);
         assertThat(profileAfterChange.getUsername()).isEqualTo(expectedUsername);
 
         // проверяем обновление страницы для повторного получения актуального профиля, т.к. без рефреша name не меняется
         // и проверяем новое name и неизменённый username в шапке
-        editProfilePage.refresh().checkProfileHeader(newName, expectedUsername);
+        editProfilePage.refresh().checkProfileHeader(VALID_NAME, expectedUsername);
     }
 
     @Test
@@ -81,8 +82,6 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
 
         // ПРОВЕРКА UI-ШАГОВ И РЕЗУЛЬТАТА ЧЕРЕЗ API \\
 
-        final String initialName = "Noname";
-        final String invalidName = "Ivan1 Ivanov";
         final String expectedUsername = profileBeforeChange.getUsername();
 
         // проверяем авторизацию пользователя через localStorage
@@ -91,7 +90,7 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
         // проверяем открытие Dashboard и неизменённый username в шапке профиля
         UserDashboard userDashboard = new UserDashboard()
                 .open()
-                .checkProfile(initialName, expectedUsername);
+                .checkProfile(INITIAL_NAME, expectedUsername);
 
         // проверяем переход на страницу редактирования профиля и ожидание загрузки исходного профиля
         EditProfilePage editProfilePage = userDashboard
@@ -100,7 +99,7 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
                 .waitUntilProfileIsLoaded();
 
         // проверяем ввод недопустимого name, содержащего цифру и сохранение значения в поле
-        editProfilePage.enterName(invalidName).checkEnteredName(invalidName);
+        editProfilePage.enterName(INVALID_NAME).checkEnteredName(INVALID_NAME);
 
         // проверяем отправку недопустимого name через UI и alert с сообщением о правиле валидации name
         editProfilePage.saveChanges().checkAlertMessageAndAccept(
@@ -114,6 +113,6 @@ public class ChangeUsernameMiddleTest extends BaseUiMiddleTest {
         assertThat(profileAfterChange.getUsername()).isEqualTo(expectedUsername);
 
         // проверяем, что в шапке осталось исходное name Noname и тот же username после рефреша
-        editProfilePage.refresh().checkProfileHeader(initialName, expectedUsername);
+        editProfilePage.refresh().checkProfileHeader(INITIAL_NAME, expectedUsername);
     }
 }

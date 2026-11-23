@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DepositMiddleTest extends BaseUiMiddleTest {
+    private static final double FIRST_ACCOUNT_INITIAL_BALANCE = 100.0;
+    private static final double SECOND_ACCOUNT_INITIAL_BALANCE = 250.0;
+    private static final int DEPOSIT_AMOUNT = 100;
+    private static final String ABOVE_MAXIMUM_DEPOSIT_AMOUNT = "5000.01";
 
     @Test
     public void userCanDepositSelectedAccountTest() {
-        final double firstAccountInitialBalance = 100.0;
-        final double secondAccountInitialBalance = 250.0;
-        final double depositAmount = 100;
-
         // ПРОВЕРКА API-ПРЕДУСЛОВИЙ \\
 
         // проверяем создание админом пользователя
@@ -36,10 +36,10 @@ public class DepositMiddleTest extends BaseUiMiddleTest {
         CreateAccountResponse secondAccount = AccountSteps.createAccount(userSpec);
 
         // проверяем начальный баланс 100.0 для первого аккаунта
-        AccountSteps.deposit(userSpec, firstAccount.getId(), firstAccountInitialBalance);
+        AccountSteps.deposit(userSpec, firstAccount.getId(), FIRST_ACCOUNT_INITIAL_BALANCE);
 
         // проверяем начальный баланс 250.0 для второго аккаунта
-        AccountSteps.deposit(userSpec, secondAccount.getId(), secondAccountInitialBalance);
+        AccountSteps.deposit(userSpec, secondAccount.getId(), SECOND_ACCOUNT_INITIAL_BALANCE);
 
         // ПРОВЕРКА UI-ШАГОВ И РЕЗУЛЬТАТА ЧЕРЕЗ API \\
 
@@ -55,7 +55,7 @@ public class DepositMiddleTest extends BaseUiMiddleTest {
         // проверяем выбор первого аккаунта
         depositPage.selectAccount(firstAccount.getAccountNumber()).checkSelectedAccount(firstAccount.getAccountNumber());
 
-        String depositAmountText = String.valueOf(depositAmount);
+        String depositAmountText = String.valueOf(DEPOSIT_AMOUNT);
 
         // проверяем ввод суммы 100
         depositPage.enterAmount(depositAmountText);
@@ -79,20 +79,17 @@ public class DepositMiddleTest extends BaseUiMiddleTest {
                 secondAccount.getId()
         );
 
-        double expectedFirstAccountBalance = firstAccountInitialBalance + depositAmount;
+        double expectedFirstAccountBalance = FIRST_ACCOUNT_INITIAL_BALANCE + DEPOSIT_AMOUNT;
 
         // проверяем увеличение баланса первого аккаунта со 100.0 до 200.0
         assertThat(firstAccountAfterDeposit.getBalance()).isEqualTo(expectedFirstAccountBalance);
 
         // проверяем сохранение баланса второго аккаунта на уровне 250.0
-        assertThat(secondAccountAfterDeposit.getBalance()).isEqualTo(secondAccountInitialBalance);
+        assertThat(secondAccountAfterDeposit.getBalance()).isEqualTo(SECOND_ACCOUNT_INITIAL_BALANCE);
     }
 
     @Test
     public void userCannotDepositMoreThanMaximumTest() {
-        final double firstAccountInitialBalance = 100.0;
-        final double depositAmount = 5000.01;
-
         // ПРОВЕРКА API-ПРЕДУСЛОВИЙ \\
 
         // проверяем создание админом пользователя
@@ -105,7 +102,7 @@ public class DepositMiddleTest extends BaseUiMiddleTest {
         CreateAccountResponse account = AccountSteps.createAccount(userSpec);
 
         // проверяем начальный баланс 100.0
-        AccountSteps.deposit(userSpec, account.getId(), firstAccountInitialBalance);
+        AccountSteps.deposit(userSpec, account.getId(), FIRST_ACCOUNT_INITIAL_BALANCE);
 
         // ПРОВЕРКА UI-ШАГОВ И РЕЗУЛЬТАТА ЧЕРЕЗ API \\
 
@@ -121,15 +118,11 @@ public class DepositMiddleTest extends BaseUiMiddleTest {
         // проверяем выбор аккаунта, баланс которого должен остаться неизменным
         depositPage.selectAccount(account.getAccountNumber()).checkSelectedAccount(account.getAccountNumber());
 
-        String depositAmountText = String.valueOf(depositAmount);
-
         // проверяем ввод недопустимой суммы для пополнения
-        depositPage.enterAmount(depositAmountText);
+        depositPage.enterAmount(ABOVE_MAXIMUM_DEPOSIT_AMOUNT);
 
         // проверяем отправку формы и alert с сообщением об отказе в пополнении
-        depositPage.submitDeposit().checkAlertMessageAndAccept(
-                BankAlert.DEPOSIT_AMOUNT_EXCEEDS_MAXIMUM.getMessage()
-        );
+        depositPage.submitDeposit().checkAlertMessageAndAccept(BankAlert.DEPOSIT_AMOUNT_EXCEEDS_MAXIMUM.getMessage());
 
         // проверяем через API поиск аккаунта по его ID
         CreateAccountResponse accountAfterDeposit = AccountSteps.findAccountById(
@@ -138,6 +131,6 @@ public class DepositMiddleTest extends BaseUiMiddleTest {
         );
 
         // проверяем сохранение исходного баланса аккаунта 100.0
-        assertThat(accountAfterDeposit.getBalance()).isEqualTo(firstAccountInitialBalance);
+        assertThat(accountAfterDeposit.getBalance()).isEqualTo(FIRST_ACCOUNT_INITIAL_BALANCE);
     }
 }
