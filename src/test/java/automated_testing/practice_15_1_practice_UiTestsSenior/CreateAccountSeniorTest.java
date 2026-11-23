@@ -16,17 +16,17 @@ public class CreateAccountSeniorTest extends BaseUiSeniorTest {
     @Test
     @UserSession
     public void userCanCreateAccountTest() {
-        new UserDashboard()
+        String alertText = new UserDashboard()
                 .open()
-                .createNewAccount();
+                .createNewAccount()
+                .readAlertTextAndAccept();
 
         List<CreateAccountResponse> createdAccounts = SessionStorage.getSteps().getAllAccounts();
-
         assertThat(createdAccounts).hasSize(1);
+        CreateAccountResponse createdAccount = createdAccounts.getFirst();
 
-        new UserDashboard().checkAlertMessageAndAccept
-                (BankAlert.NEW_ACCOUNT_CREATED.getMessage() + createdAccounts.getFirst().getAccountNumber());
-
-        assertThat(createdAccounts.getFirst().getBalance()).isZero();
+        String expectedAlert = BankAlert.NEW_ACCOUNT_CREATED.getMessage() + createdAccount.getAccountNumber();
+        assertThat(alertText).isEqualTo(expectedAlert);
+        assertThat(createdAccount.getBalance()).isZero();
     }
 }

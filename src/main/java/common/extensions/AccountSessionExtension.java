@@ -4,6 +4,7 @@ import automated_testing_api_senior.models.CreateAccountResponse;
 import automated_testing_api_senior.models.CreateUserRequest;
 import automated_testing_api_senior.requests.steps.AccountSteps;
 import automated_testing_api_senior.specs.RequestSpecs;
+import common.RepeatUtils;
 import common.annotations.AccountSession;
 import common.annotations.UserSession;
 import common.storage.AccountSessionStorage;
@@ -45,10 +46,11 @@ public class AccountSessionExtension implements BeforeEachCallback {
             CreateUserRequest user = SessionStorage.getUser(userNumber);
             RequestSpecification userSpec = RequestSpecs.authAsUser(user.getUsername(), user.getPassword());
 
-            for (int accountNumber = 0; accountNumber < accountCount; accountNumber++) {
+            int currentUserNumber = userNumber;
+            RepeatUtils.repeat(accountCount, () -> {
                 CreateAccountResponse account = AccountSteps.createAccount(userSpec);
-                AccountSessionStorage.addAccount(userNumber, account);
-            }
+                AccountSessionStorage.addAccount(currentUserNumber, account);
+            });
         }
     }
 }

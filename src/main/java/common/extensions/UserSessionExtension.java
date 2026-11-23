@@ -3,6 +3,7 @@ package common.extensions;
 import automated_testing_api_senior.models.CreateUserRequest;
 import automated_testing_api_senior.requests.steps.AdminSteps;
 import automated_testing_ui_senior.pages.BasePage;
+import common.RepeatUtils;
 import common.annotations.UserSession;
 import common.storage.SessionStorage;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -23,10 +24,7 @@ public class UserSessionExtension implements BeforeEachCallback {
 
             List<CreateUserRequest> users = new LinkedList<>();
 
-            for (int i = 0; i < userCount; i++) {
-                CreateUserRequest user = AdminSteps.createUser();
-                users.add(user);
-            }
+            RepeatUtils.repeat(userCount, () -> users.add(AdminSteps.createUser()));
 
             SessionStorage.addUsers(users);
 

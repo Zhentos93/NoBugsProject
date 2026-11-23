@@ -36,6 +36,13 @@ public abstract class BasePage<T extends BasePage> {
         return (T) this;
     }
 
+    public String readAlertTextAndAccept() {
+        Alert alert = switchTo().alert();
+        String alertText = alert.getText();
+        alert.accept();
+        return alertText;
+    }
+
     public static void authAsUser(String username, String password) {
         Selenide.open("/");
         String userAuthHeader = RequestSpecs.getUserAuthHeader(username, password);
