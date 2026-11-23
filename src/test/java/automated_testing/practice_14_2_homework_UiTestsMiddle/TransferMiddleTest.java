@@ -14,14 +14,16 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransferMiddleTest extends BaseUiMiddleTest {
+    private static final double SENDER_FIRST_ACCOUNT_INITIAL_BALANCE = 1000.0;
+    private static final double SENDER_SECOND_ACCOUNT_INITIAL_BALANCE = 50.0;
+    private static final double RECEIVER_ACCOUNT_INITIAL_BALANCE = 200.0;
+    private static final String EXPECTED_WELCOME_TEXT = "Welcome, noname!";
+    private static final int TRANSFER_AMOUNT = 100;
+    private static final double SENDER_ACCOUNT_INITIAL_BALANCE = 50.0;
+
 
     @Test
     public void userCanTransferMoneyToAnotherUserTest() {
-        final double senderFirstAccountInitialBalance = 1000.0;
-        final double senderSecondAccountInitialBalance = 50.0;
-        final double receiverAccountInitialBalance = 200.0;
-        final double transferAmount = 100;
-
         // ПРОВЕРКА API-ПРЕДУСЛОВИЙ \\
 
         // проверяем создание админом пользователя-отправителя
@@ -49,13 +51,13 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         CreateAccountResponse receiverAccount = AccountSteps.createAccount(receiverSpec);
 
         // проверяем начальный баланс 1000.0 для первого аккаунта отправителя
-        AccountSteps.deposit(senderSpec, senderFirstAccount.getId(), senderFirstAccountInitialBalance);
+        AccountSteps.deposit(senderSpec, senderFirstAccount.getId(), SENDER_FIRST_ACCOUNT_INITIAL_BALANCE);
 
         // проверяем начальный баланс 50.0 для второго аккаунта отправителя
-        AccountSteps.deposit(senderSpec, senderSecondAccount.getId(), senderSecondAccountInitialBalance);
+        AccountSteps.deposit(senderSpec, senderSecondAccount.getId(), SENDER_SECOND_ACCOUNT_INITIAL_BALANCE);
 
         // проверяем начальный баланс 200.0 для первого аккаунта получателя
-        AccountSteps.deposit(receiverSpec, receiverAccount.getId(), receiverAccountInitialBalance);
+        AccountSteps.deposit(receiverSpec, receiverAccount.getId(), RECEIVER_ACCOUNT_INITIAL_BALANCE);
 
         // ПРОВЕРКА UI-ШАГОВ И РЕЗУЛЬТАТА ЧЕРЕЗ API \\
 
@@ -65,7 +67,7 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         // проверяем открытие Dashboard и переход на страницу перевода
         TransferPage transferPage = new UserDashboard()
                 .open()
-                .checkWelcomeText("Welcome, noname!")
+                .checkWelcomeText(EXPECTED_WELCOME_TEXT)
                 .openTransferPage()
                 .checkPageIsOpened()
                 .startNewTransfer();
@@ -78,7 +80,7 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         transferPage.enterRecipientAccountNumber(receiverAccount.getAccountNumber())
                 .checkRecipientAccountNumber(receiverAccount.getAccountNumber());
 
-        String transferAmountText = String.valueOf(transferAmount);
+        String transferAmountText = String.valueOf(TRANSFER_AMOUNT);
 
         // проверяем ввод суммы перевода 100
         transferPage.enterAmount(transferAmountText);
@@ -94,14 +96,14 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         CreateAccountResponse[] senderAccountsAfterTransfer = AccountSteps.getAccounts(senderSpec);
         CreateAccountResponse[] receiverAccountsAfterTransfer = AccountSteps.getAccounts(receiverSpec);
 
-        double expectedSenderFirstAccountBalance = senderFirstAccountInitialBalance - transferAmount;
-        double expectedReceiverAccountBalance = receiverAccountInitialBalance + transferAmount;
+        double expectedSenderFirstAccountBalance = SENDER_FIRST_ACCOUNT_INITIAL_BALANCE - TRANSFER_AMOUNT;
+        double expectedReceiverAccountBalance = RECEIVER_ACCOUNT_INITIAL_BALANCE + TRANSFER_AMOUNT;
 
         assertThat(AccountSteps.findAccountById(senderAccountsAfterTransfer, senderFirstAccount.getId())
                 .getBalance()).isEqualTo(expectedSenderFirstAccountBalance);
 
         assertThat(AccountSteps.findAccountById(senderAccountsAfterTransfer, senderSecondAccount.getId())
-                .getBalance()).isEqualTo(senderSecondAccountInitialBalance);
+                .getBalance()).isEqualTo(SENDER_SECOND_ACCOUNT_INITIAL_BALANCE);
 
         assertThat(AccountSteps.findAccountById(receiverAccountsAfterTransfer, receiverAccount.getId())
                 .getBalance()).isEqualTo(expectedReceiverAccountBalance);
@@ -109,10 +111,6 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
 
     @Test
     public void userCannotTransferMoreThanAvailableBalanceTest() {
-        final double senderAccountInitialBalance = 50.0;
-        final double receiverAccountInitialBalance = 200.0;
-        final double transferAmount = 100;
-
         // ПРОВЕРКА API-ПРЕДУСЛОВИЙ \\
 
         // проверяем создание админом пользователя-отправителя
@@ -137,10 +135,10 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         CreateAccountResponse receiverAccount = AccountSteps.createAccount(receiverSpec);
 
         // проверяем начальный баланс 50.0 для аккаунта отправителя
-        AccountSteps.deposit(senderSpec, senderAccount.getId(), senderAccountInitialBalance);
+        AccountSteps.deposit(senderSpec, senderAccount.getId(), SENDER_ACCOUNT_INITIAL_BALANCE);
 
         // проверяем начальный баланс 200.0 для аккаунта получателя
-        AccountSteps.deposit(receiverSpec, receiverAccount.getId(), receiverAccountInitialBalance);
+        AccountSteps.deposit(receiverSpec, receiverAccount.getId(), RECEIVER_ACCOUNT_INITIAL_BALANCE);
 
         // ПРОВЕРКА UI-ШАГОВ И РЕЗУЛЬТАТА ЧЕРЕЗ API \\
 
@@ -150,7 +148,7 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         // проверяем открытие Dashboard и переход на страницу перевода
         TransferPage transferPage = new UserDashboard()
                 .open()
-                .checkWelcomeText("Welcome, noname!")
+                .checkWelcomeText(EXPECTED_WELCOME_TEXT)
                 .openTransferPage()
                 .checkPageIsOpened()
                 .startNewTransfer();
@@ -163,7 +161,7 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
         transferPage.enterRecipientAccountNumber(receiverAccount.getAccountNumber())
                 .checkRecipientAccountNumber(receiverAccount.getAccountNumber());
 
-        String transferAmountText = String.valueOf(transferAmount);
+        String transferAmountText = String.valueOf(TRANSFER_AMOUNT);
 
         // проверяем ввод суммы 100
         transferPage.enterAmount(transferAmountText);
@@ -180,10 +178,10 @@ public class TransferMiddleTest extends BaseUiMiddleTest {
 
         // проверяем, что после отказа баланс отправителя остался равен 50.0
         assertThat(AccountSteps.findAccountById(senderAccountsAfterTransfer, senderAccount.getId())
-                .getBalance()).isEqualTo(senderAccountInitialBalance);
+                .getBalance()).isEqualTo(SENDER_ACCOUNT_INITIAL_BALANCE);
 
         // проверяем, что после отказа баланс получателя остался равен 200.0
         assertThat(AccountSteps.findAccountById(receiverAccountsAfterTransfer, receiverAccount.getId())
-                .getBalance()).isEqualTo(receiverAccountInitialBalance);
+                .getBalance()).isEqualTo(RECEIVER_ACCOUNT_INITIAL_BALANCE);
     }
 }
