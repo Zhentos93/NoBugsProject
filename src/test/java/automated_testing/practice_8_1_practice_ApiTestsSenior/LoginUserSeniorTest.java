@@ -17,14 +17,14 @@ public class LoginUserSeniorTest extends BaseSeniorTest {
 
     @Test
     public void adminCanGenerateAuthTokenTest() {
+        CreateUserRequest admin = CreateUserRequest.getAdmin();
         LoginUserRequest userRequest = LoginUserRequest.builder()
-                .username("admin")
-                .password("admin")
+                .username(admin.getUsername())
+                .password(admin.getPassword())
                 .build();
 
-        new ValidatedCrudRequester<LoginUserResponse>(RequestSpecs.unAuthSpec(),
-                Endpoint.LOGIN,
-                ResponseSpecs.requestReturnsOK())
+        new ValidatedCrudRequester<LoginUserResponse>(
+                RequestSpecs.unAuthSpec(), Endpoint.LOGIN, ResponseSpecs.requestReturnsOK())
                 .post(userRequest);
     }
 
@@ -32,10 +32,10 @@ public class LoginUserSeniorTest extends BaseSeniorTest {
     public void userCanGenerateAuthTokenTest() {
         CreateUserRequest userRequest = AdminSteps.createUser();
 
-        new CrudRequester(RequestSpecs.unAuthSpec(),
-                Endpoint.LOGIN,
-                ResponseSpecs.requestReturnsOK())
-                .post(LoginUserRequest.builder().username(userRequest.getUsername()).password(userRequest.getPassword()).build())
-                .header("Authorization", Matchers.notNullValue());
+        new CrudRequester(RequestSpecs.unAuthSpec(), Endpoint.LOGIN, ResponseSpecs.requestReturnsOK())
+                .post(LoginUserRequest.builder()
+                        .username(userRequest.getUsername())
+                        .password(userRequest.getPassword()).build())
+                .header(RequestSpecs.AUTHORIZATION_HEADER, Matchers.notNullValue());
     }
 }

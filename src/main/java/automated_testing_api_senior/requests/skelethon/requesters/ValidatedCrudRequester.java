@@ -4,11 +4,16 @@ import automated_testing_api_senior.models.BaseModel;
 import automated_testing_api_senior.requests.skelethon.Endpoint;
 import automated_testing_api_senior.requests.skelethon.HttpRequest;
 import automated_testing_api_senior.requests.skelethon.interfaces.CrudEndpointInterface;
+import automated_testing_api_senior.requests.skelethon.interfaces.GetAllEndpointInterface;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 
-public class ValidatedCrudRequester<T extends BaseModel> extends HttpRequest implements CrudEndpointInterface {
-    private CrudRequester crudRequester;
+import java.util.Arrays;
+import java.util.List;
+
+public class ValidatedCrudRequester<T extends BaseModel> extends HttpRequest implements CrudEndpointInterface,
+        GetAllEndpointInterface {
+    private final CrudRequester crudRequester;
 
     public ValidatedCrudRequester(RequestSpecification requestSpecification, Endpoint endpoint,
                                   ResponseSpecification responseSpecification) {
@@ -28,5 +33,11 @@ public class ValidatedCrudRequester<T extends BaseModel> extends HttpRequest imp
     @Override
     public Object get(long id) {
         return null;
+    }
+
+    @Override
+    public List<T> getAll(Class<?> clazz) {
+        T[] array = (T[]) crudRequester.getAll(clazz).extract().as(clazz);
+        return Arrays.asList(array);
     }
 }

@@ -1,5 +1,6 @@
 package automated_testing_api_senior.models;
 
+import automated_testing_api_senior.configs.Config;
 import automated_testing_api_senior.generators.GeneratingRule;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,11 @@ public class CreateUserRequest extends BaseModel {
     private String password;
     @GeneratingRule(regex = "^USER$")
     private String role;
+
+    public static CreateUserRequest getAdmin() {
+        return CreateUserRequest.builder()
+                .username(Config.getProperty(Config.ADMIN_USERNAME))
+                .password(Config.getProperty(Config.ADMIN_PASSWORD))
+                .build();
+    }
 }

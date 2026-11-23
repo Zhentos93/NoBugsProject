@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Config {
+    public static final String ADMIN_USERNAME = "admin.username";
+    public static final String ADMIN_PASSWORD = "admin.password";
+
     private static final Config INSTANCE = new Config();
     private final Properties properties = new Properties();
 

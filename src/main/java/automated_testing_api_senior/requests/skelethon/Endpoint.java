@@ -49,7 +49,6 @@ public enum Endpoint {
             UserProfileResponse.class
     );
 
-
     private final String url;
     private final Class<? extends BaseModel> requestModel;
     private final Class<? extends BaseModel> responseModel;
