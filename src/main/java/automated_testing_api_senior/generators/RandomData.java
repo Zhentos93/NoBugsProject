@@ -8,22 +8,35 @@ public class RandomData {
     private static final Random RANDOM = new Random();
     private static final double MIN_DEPOSIT_AMOUNT = 0.01;
     private static final double MAX_DEPOSIT_AMOUNT = 5000.0;
+    private static final double MAX_TRANSFER_AMOUNT = 10000.0;
+    private static final double MAX_INSUFFICIENT_BALANCE_INCREMENT = 100.0;
 
     private RandomData() {
     }
 
-    public static String getUsername() {
-        return RandomStringUtils.secure().nextAlphabetic(10);
-    }
-
-    public static String getPassword() {
-        return RandomStringUtils.secure().nextAlphabetic(3).toUpperCase() +
-                RandomStringUtils.secure().nextAlphabetic(5).toLowerCase() +
-                RandomStringUtils.secure().nextNumeric(3) + "$";
-    }
-
     public static double getValidDepositAmount() {
         return getAmount(MIN_DEPOSIT_AMOUNT, MAX_DEPOSIT_AMOUNT);
+    }
+
+    public static double getDepositAmountAboveMaximum() {
+        int excessInCents = RANDOM.nextInt(1, 101);
+        return MAX_DEPOSIT_AMOUNT + excessInCents / 100.0;
+    }
+
+    public static double getValidAmountNotGreaterThan(double maxInclusive) {
+        if (maxInclusive < MIN_DEPOSIT_AMOUNT) {
+            throw new IllegalArgumentException("Maximum amount must be at least " + MIN_DEPOSIT_AMOUNT);
+        }
+        return getAmount(MIN_DEPOSIT_AMOUNT, Math.min(maxInclusive, MAX_TRANSFER_AMOUNT));
+    }
+
+    public static double getAmountGreaterThan(double amount) {
+        double maximumIncrement = Math.min(MAX_INSUFFICIENT_BALANCE_INCREMENT, MAX_TRANSFER_AMOUNT - amount);
+
+        if (maximumIncrement < MIN_DEPOSIT_AMOUNT) {
+            throw new IllegalArgumentException("Cannot generate a valid amount greater than " + amount);
+        }
+        return roundAmount(amount + getAmount(MIN_DEPOSIT_AMOUNT, maximumIncrement));
     }
 
     public static double getAmount(double minInclusive, double maxInclusive) {
